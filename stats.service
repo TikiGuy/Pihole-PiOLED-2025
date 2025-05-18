@@ -1,0 +1,16 @@
+[Unit]
+Description=Pi-hole Stats Display Script
+After=network.target
+
+[Service]
+User=pi
+HomeDirectory=/home/pi  # Add this line (replace with your actual home directory if different)
+WorkingDirectory=/home/pi/
+Environment="PATH=/home/pi/pihole/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/bin/bash -c "source /home/pi/pihole/bin/activate && /home/pi/pihole/bin/python3 /home/pi/stats.py"
+Restart=on-failure
+StandardOutput=append:/var/log/stats.log
+StandardError=append:/var/log/stats_error.log
+
+[Install]
+WantedBy=multi-user.target
