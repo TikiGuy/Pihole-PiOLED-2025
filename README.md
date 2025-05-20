@@ -2,6 +2,7 @@ Pihole PiOLED 2025 Guide
 
 <hr>
 Follow the directions in the wiki section to skip all the headaches I ran into.
+
 https://github.com/TikiGuy/Pihole-PiOLED-2025/wiki/Install-Pihole-with-PiOLED-and-Unbound-%E2%80%90-2025-Edition-(05-20-26)
 <hr>
 
