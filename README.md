@@ -15,3 +15,6 @@ I also had issues getting the PiOLED to work.
 
 Follow the directions in the wiki section to skip all the headaches I ran into.
 
+I also used the following document in formulating my approach to getting it working.
+
+https://www.crosstalksolutions.com/the-worlds-greatest-pi-hole-and-unbound-tutorial-2023/
