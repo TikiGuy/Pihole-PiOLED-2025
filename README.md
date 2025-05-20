@@ -1,4 +1,9 @@
-Pihole PiOLED 2025 Guide  -DRAFT-
+Pihole PiOLED 2025 Guide
+
+<hr>
+Follow the directions in the wiki section to skip all the headaches I ran into.
+https://github.com/TikiGuy/Pihole-PiOLED-2025/wiki/Install-Pihole-with-PiOLED-and-Unbound-%E2%80%90-2025-Edition-(05-20-26)
+<hr>
 
 I recently decided to finally get pihole up and running at home.  When looking at buying two raspberry pi W 2 devices I saw the instructions on how to set up pihole with the PiOLED display on Adafruit's Website.
 
@@ -13,8 +18,7 @@ For those of us that aren't programmers and looking for true step by step direct
 
 I also had issues getting the PiOLED to work.
 
-Follow the directions in the wiki section to skip all the headaches I ran into.
-https://github.com/TikiGuy/Pihole-PiOLED-2025/wiki/Install-Pihole-with-PiOLED-and-Unbound-%E2%80%90-2025-Edition-(05-20-26)
+
 
 I also used the following document in formulating my approach to getting it working.
 
