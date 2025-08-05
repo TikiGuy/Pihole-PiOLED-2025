@@ -10,7 +10,7 @@ I recently decided to finally get pihole up and running at home.  When looking a
 
 http://learn.adafruit.com/pi-hole-ad-blocker-with-pi-zero-w
 
-The article shows a last update in 2024 which I incorrectly assumed meant that I'd be able to follow it with no issues in 2025.  I ran into quite a few issues and had to tweak a few things which I'll outline below.
+Update: The article has been updated as of June 2025, hopefully I had somethign to do with that =D ~~The article shows a last update in 2024 which I incorrectly assumed meant that I'd be able to follow it with no issues in 2025.~~  I ran into quite a few issues and had to tweak a few things which I'll outline below.
 
 The biggest issue revolves around the fact that Pihole changed the way the API works, specifically the authentication is no longer key based, it's session based and they also changed how the API functions.
 
