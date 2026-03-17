@@ -1,4 +1,4 @@
-# Pihole-PiOLED-2025 Guide
+# PiHole Zero OLED Guide
 
 Welcome to the comprehensive step-by-step guide to setting up Pi-hole, with Unbound and the Adafruit I2C PiOLED on a Raspberry Pi Zero 2 W!
 
