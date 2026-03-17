@@ -30,6 +30,7 @@
 
 # Import Python System Libraries
 import json
+import os
 import subprocess
 import time
 
@@ -85,7 +86,9 @@ x = 0
 # Load nice silkscreen font
 font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 
-PIHOLE_PASSWORD = "YOUR PASSWORD HERE"  # Replace with your actual password
+# Read the PIHOLE_PASS environment variable (Set in the .env file and loaded by systemd)
+# For Pi-hole v6.3+, it is highly recommended to use an App Token instead of your web password.
+PIHOLE_PASSWORD = os.getenv('PIHOLE_PASS', "YOUR PASSWORD HERE")
 auth_url = "http://localhost/api/auth"
 sid = None
 session_valid_until = 0  # Keep track of session validity

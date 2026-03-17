@@ -355,7 +355,24 @@ Click **Save & Apply**.
 
 ## Phase 5: Pi-hole Stats on PiOLED
 
-### 17. Create the `stats.py` Script
+### 17. Configuration & Secret Management
+We use a `.env` file to securely store your Pi-hole credentials. This prevents you from hardcoding your password directly into the python script, which is a common security risk.
+
+1. Create the `.env` file in your home directory:
+```bash
+nano ~/.env
+```
+2. Paste the following configuration:
+```env
+# Pi-hole Configuration
+# For Pi-hole v6.3+, it is highly recommended to use an App Token instead of your web password.
+# You can generate an App Token in the Pi-hole Web Interface under Settings > API > App Tokens.
+
+PIHOLE_PASS="YOUR_PASSWORD_OR_APP_TOKEN_HERE"
+```
+3. Replace `"YOUR_PASSWORD_OR_APP_TOKEN_HERE"` with your actual web interface password or App Token, save (`Ctrl + X`, `Y`), and exit.
+
+### 18. Create the `stats.py` Script
 Now that we have Pi-hole installed and configured to point at Unbound, let's get the display to show live Pi-hole stats via the API.
 
 First, install the font:
@@ -380,6 +397,7 @@ Paste the following into it:
 
 # Import Python System Libraries
 import json
+import os
 import subprocess
 import time
 
@@ -425,7 +443,9 @@ x = 0
 # Load nice silkscreen font
 font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 
-PIHOLE_PASSWORD = "YOURPASSWORD HERE"  # Replace with your actual password
+# Read the PIHOLE_PASS environment variable (Set in the .env file and loaded by systemd)
+# For Pi-hole v6.3+, it is highly recommended to use an App Token instead of your web password.
+PIHOLE_PASSWORD = os.getenv('PIHOLE_PASS', "YOUR_PASSWORD_OR_APP_TOKEN_HERE")
 auth_url = "http://localhost/api/auth"
 sid = None
 session_valid_until = 0  # Keep track of session validity
@@ -511,11 +531,11 @@ while True:
     time.sleep(DISPLAY_OFF)
 ```
 
-**IMPORTANT:** Scroll up to the `PIHOLE_PASSWORD = "YOURPASSWORD HERE"` section and replace `"YOURPASSWORD HERE"` with your web interface password from Step 12.
+### 19. Test the Stats Script
+Since our python script now relies on environment variables, we need to pass the `.env` file directly when testing via terminal. You can do this by exporting the variables first, or running it inline:
 
-### 18. Test the Stats Script
 ```bash
-python3 stats.py
+export $(cat ~/.env | grep -v '^#') && python3 stats.py
 ```
 You should see output similar to this, indicating successful session ID acquisition:
 ![image](https://github.com/user-attachments/assets/a19dabd8-2bf4-4592-80c8-97db6dadb4ae)
@@ -525,8 +545,10 @@ And your screen should light up! (Your display may show `0` or `N/A` until you c
 
 Press `Ctrl + C` to stop the `stats.py` script.
 
-### 19. Create `stats.service` (Run Script on Boot)
-Now we will set the script to start automatically on boot. Let's create a systemd service file:
+### 20. Create `stats.service` (Run Script on Boot)
+Now we will set the script to start automatically on boot. By setting `EnvironmentFile=/home/pi/.env`, systemd will securely inject your Pi-hole credentials directly into the script's environment.
+
+Let's create a systemd service file:
 
 ```bash
 sudo nano /etc/systemd/system/stats.service
@@ -542,6 +564,7 @@ After=network.target
 User=pi
 HomeDirectory=/home/pi
 WorkingDirectory=/home/pi/
+EnvironmentFile=/home/pi/.env
 Environment="PATH=/home/pi/pihole/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ExecStart=/bin/bash -c "source /home/pi/pihole/bin/activate && /home/pi/pihole/bin/python3 /home/pi/stats.py"
 Restart=on-failure
@@ -560,7 +583,7 @@ sudo systemctl start stats.service
 ```
 The script should now run in the background, turning your screen on and off correctly to prevent burn-in.
 
-### 20. Final Reboot
+### 21. Final Reboot
 Reboot your Pi to ensure everything starts up as expected:
 ```bash
 sudo reboot
