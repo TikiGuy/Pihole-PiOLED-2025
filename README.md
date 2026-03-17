@@ -76,21 +76,26 @@ import board
 import digitalio
 import busio
 
-print("Hello, blinka!")
+def main():
+    print("Hello, blinka!")
 
-# Try to create a Digital input
-pin = digitalio.DigitalInOut(board.D4)
-print("Digital IO ok!")
+    # Try to create a Digital input
+    pin = digitalio.DigitalInOut(board.D4)
+    print("Digital IO ok!")
 
-# Try to create an I2C device
-i2c = busio.I2C(board.SCL, board.SDA)
-print("I2C ok!")
+    # Try to create an I2C device
+    i2c = busio.I2C(board.SCL, board.SDA)
+    print("I2C ok!")
 
-# Try to create an SPI device
-spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
-print("SPI ok!")
+    # Try to create an SPI device
+    spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
+    print("SPI ok!")
 
-print("done!")
+    print("done!")
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 Press `Ctrl + X` to exit, type `Y` to save, and press `Enter` to confirm the filename. Now execute it:
@@ -425,6 +430,9 @@ auth_url = "http://localhost/api/auth"
 sid = None
 session_valid_until = 0  # Keep track of session validity
 
+# Create a persistent session to reuse network connections
+req_session = requests.Session()
+
 while True:
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
@@ -438,7 +446,7 @@ while True:
     if sid is None or current_time > session_valid_until - 60:
         try:
             auth_payload = {"password": PIHOLE_PASSWORD}
-            auth_response = requests.post(auth_url, json=auth_payload)
+            auth_response = req_session.post(auth_url, json=auth_payload)
             auth_response.raise_for_status()
             auth_data = auth_response.json()
             sid = auth_data.get("session", {}).get("sid")
@@ -464,7 +472,7 @@ while True:
     if sid:
         api_url = f"http://localhost/api/stats/summary?sid={sid}"
         try:
-            api_response = requests.get(api_url)
+            api_response = req_session.get(api_url)
             api_response.raise_for_status()
             api_data = api_response.json()
 
@@ -479,13 +487,20 @@ while True:
 
         except requests.exceptions.RequestException as e:
             print(f"API request failed: {e}")
+            draw.text((x, top + 8), "API Request Failed", font=font, fill=255)
             sid = None
         except json.JSONDecodeError:
             print("Failed to decode API JSON.")
+            draw.text((x, top + 8), "API JSON Error", font=font, fill=255)
             sid = None
         except KeyError as e:
             print(f"Key not found in API response: {e}")
+            draw.text((x, top + 8), "API Data Error", font=font, fill=255)
             sid = None
+    else:
+        # Display fallback text if session is missing entirely
+        draw.text((x, top), "IP: " + str(IP) + " (" + HOST + ")", font=font, fill=255)
+        draw.text((x, top + 8), "Auth Failed/Missing", font=font, fill=255)
 
     # Display image.
     disp.image(image)
