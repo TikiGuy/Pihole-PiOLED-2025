@@ -367,10 +367,13 @@ nano ~/.env
 # Pi-hole Configuration
 # For Pi-hole v6.3+, it is highly recommended to use an App Token instead of your web password.
 # You can generate an App Token in the Pi-hole Web Interface under Settings > API > App Tokens.
-
 PIHOLE_PASS="YOUR_PASSWORD_OR_APP_TOKEN_HERE"
+
+# The URL of your Pi-hole. If running this script on the Pi-hole itself, leave as localhost.
+# If running on a custom port, add it here (e.g., http://localhost:8080)
+PIHOLE_URL="http://localhost"
 ```
-3. Replace `"YOUR_PASSWORD_OR_APP_TOKEN_HERE"` with your actual web interface password or App Token, save (`Ctrl + X`, `Y`), and exit.
+3. Replace `"YOUR_PASSWORD_OR_APP_TOKEN_HERE"` with your actual web interface password or App Token. (If you are running Pi-hole on a custom port, update the `PIHOLE_URL` accordingly). Save (`Ctrl + X`, `Y`), and exit.
 
 ### 18. Create the `stats.py` Script
 Now that we have Pi-hole installed and configured to point at Unbound, let's get the display to show live Pi-hole stats via the API.
@@ -446,7 +449,10 @@ font = ImageFont.truetype('/home/pi/slkscr.ttf', 8)
 # Read the PIHOLE_PASS environment variable (Set in the .env file and loaded by systemd)
 # For Pi-hole v6.3+, it is highly recommended to use an App Token instead of your web password.
 PIHOLE_PASSWORD = os.getenv('PIHOLE_PASS', "YOUR_PASSWORD_OR_APP_TOKEN_HERE")
-auth_url = "http://localhost/api/auth"
+# Read the PIHOLE_URL environment variable to allow custom ports or remote IPs
+PIHOLE_URL = os.getenv('PIHOLE_URL', "http://localhost")
+
+auth_url = f"{PIHOLE_URL}/api/auth"
 sid = None
 session_valid_until = 0  # Keep track of session validity
 
@@ -490,7 +496,7 @@ while True:
             continue
 
     if sid:
-        api_url = f"http://localhost/api/stats/summary?sid={sid}"
+        api_url = f"{PIHOLE_URL}/api/stats/summary?sid={sid}"
         try:
             api_response = req_session.get(api_url)
             api_response.raise_for_status()
@@ -588,6 +594,27 @@ Reboot your Pi to ensure everything starts up as expected:
 ```bash
 sudo reboot
 ```
+
+---
+
+## Migrating from the Old Setup
+If you set up your Pi-hole display before the `.env` secret management changes were introduced, you must update your configuration to keep your script working properly.
+
+1. Create your new `.env` file following the instructions in **Step 17** above.
+2. Update your `stats.py` script by replacing its contents with the new code block from **Step 18**.
+3. Edit your systemd service file to inject the `.env` file into the environment:
+   ```bash
+   sudo nano /etc/systemd/system/stats.service
+   ```
+   Add the following line right below `WorkingDirectory=/home/pi/`:
+   ```ini
+   EnvironmentFile=/home/pi/.env
+   ```
+4. Reload the daemon and restart the service:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart stats.service
+   ```
 
 ---
 
